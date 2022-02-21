@@ -1,0 +1,28 @@
+{
+  "name": "html-me",
+  "version": "0.0.1",
+  "description": "HTML maker through sets of functions",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ardhi/html-me.git"
+  },
+  "keywords": [
+    "html",
+    "bootstrap",
+    "maker",
+    "builder"
+  ],
+  "author": "Ardhi Lukianto <ardhi@lukianto.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ardhi/html-me/issues"
+  },
+  "homepage": "https://github.com/ardhi/html-me#readme",
+  "dependencies": {
+    "lodash": "^4.17.21"
+  }
+}
