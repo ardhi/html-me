@@ -5,7 +5,7 @@ const defWidth = ['col-sm-3', 'col-sm-9']
 
 module.exports = function ({ content, attrib = {}, option = {} }) {
   option.defaultClass = ['mb-3']
-  const bs5 = new Bs5({ tag: 'div', content, attrib: _.omit(attrib, ['label']), option })
+  const bs5 = new Bs5({ tag: 'div', content, attrib, option })
   let l
   let r
   if (bs5.attrib.width) {
@@ -18,17 +18,16 @@ module.exports = function ({ content, attrib = {}, option = {} }) {
   r = bs5.normalizeWidth(r)
   bs5.attrib.class = bs5.normalizeArray(bs5.attrib.class, { default: 'mb-3', common: ['row'] })
   const lblAttrib = bs5.filterAttrib('label', { asValueFor: 'label' })
-  lblAttrib.label = attrib.label
   lblAttrib.class.unshift(`${l} col-form-label`)
   if (lblAttrib.size) lblAttrib.class.push(`col-form-label-${lblAttrib.size}`)
   const lblEl = label({ attrib: lblAttrib })
   const inputEl = bs5.content
 
-  const cntrAttrib = bs5.filterAttrib('container')
-  cntrAttrib.class.unshift(r)
-  const cntrBs5 = new Bs5({ tag: 'div', content: inputEl, attrib: cntrAttrib })
-  const cntrEl = cntrBs5.write()
-  bs5.content = [lblEl, cntrEl]
+  const wrapperAttrib = bs5.filterAttrib('wrapper')
+  wrapperAttrib.class.unshift(r)
+  const wrapperBs5 = new Bs5({ tag: 'div', content: inputEl, attrib: wrapperAttrib })
+  const wrapperEl = wrapperBs5.write()
+  bs5.content = [lblEl, wrapperEl]
   bs5.option.omitted.push('width')
   return bs5.write()
 }

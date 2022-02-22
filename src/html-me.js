@@ -11,9 +11,9 @@ class HtmlMe {
     this.option.omitted = this.option.omitted || []
     if (_.isString(this.option.omitted)) this.option.omitted = [this.option.omitted]
     this.tag = tag
-    this.content = attrib.label || content
-    this.content = _.isString(this.content) ? [this.content] : this.content
-    if (!this.content) this.content = []
+    this.content = content
+    if (_.isEmpty(this.content) && attrib.label) this.content = attrib.label
+    if (_.isString(this.content)) this.content = [this.content]
     this.attrib = _.cloneDeep(attrib)
     if (this.attrib.label) this.option.omitted.push('label')
     this.attrib.class = this.normalizeArray(this.attrib.class, {
@@ -32,6 +32,9 @@ class HtmlMe {
   }
 
   open () {
+    this.setTag()
+    if (this.attrib.tag) delete this.attrib.tag
+    if (_.isFunction(this.option.onOpen)) this.option.onOpen.call(this)
     const attrs = []
     this.sanitize()
     _.forOwn(_.omit(this.attrib, this.option.omitted), (v, k) => {
@@ -50,10 +53,13 @@ class HtmlMe {
   }
 
   close () {
+    this.setTag()
+    if (_.isFunction(this.option.onClose)) this.option.onClose.call(this)
     return `</${this.tag}>${this.newLine ? nl : ''}`
   }
 
   write () {
+    if (_.isFunction(this.option.onWrite)) this.option.onWrite.call(this)
     const result = []
     result.push(this.open())
     if (this.content.length > 0) {
@@ -64,7 +70,12 @@ class HtmlMe {
   }
 
   // helpers
+  setTag () {
+    this.tag = this.attrib.tag || this.tag
+  }
+
   sanitize () {
+    delete this.attrib.matched
   }
 
   generateId () {
@@ -119,11 +130,12 @@ class HtmlMe {
 
   filterAttrib (key, filteredOpts = {}) {
     const filtered = {}
-    const all = _.keys(this.attrib)
     const rest = []
     if (filteredOpts.asValueFor) {
       filtered[filteredOpts.asValueFor] = this.attrib[key]
+      delete this.attrib[key]
     }
+    const all = _.keys(this.attrib)
     _.forOwn(this.attrib, (v, k) => {
       const [name, ...parts] = _.kebabCase(k).split('-')
       if (name === key && parts.length > 0) {
@@ -136,9 +148,13 @@ class HtmlMe {
     _.each(all, a => {
       if (!rest.includes(a)) delete this.attrib[a]
     })
-    delete this.attrib[key]
     filtered.class = this.normalizeArray(filtered.class, filteredOpts.class)
     filtered.style = this.normalizeObject(filtered.style, filteredOpts.style)
+    const hasClass = !_.isEmpty(filtered.class)
+    const hasStyle = !_.isEmpty(filtered.style)
+    const hasAny = !_.isEmpty(_.keys(_.omit(filtered, ['class', 'style'])))
+    const hasKey = _.has(this.attrib, key)
+    if (hasClass || hasStyle || hasKey || hasAny) filtered.matched = true // internal use, will be trashed before written
     return filtered
   }
 
@@ -154,6 +170,21 @@ class HtmlMe {
     if (this.attrib[key] !== true) item += (prefix ? '-' : '') + this.attrib[key]
     this.attrib.class.push(item)
     delete this.attrib[key]
+  }
+
+  setAttrib (key, value) {
+    this.attrib = _.set(this.attrib, key, value)
+  }
+
+  setAttribClass (value, first) {
+    if (_.isString(value)) value = [value]
+    _.each(value, v => {
+      this.attrib.class[first ? 'unshift' : 'push'](v)
+    })
+  }
+
+  getAttrib (key, def) {
+    return _.get(this.attrib, key, def)
   }
 
 }
