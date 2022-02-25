@@ -14,10 +14,10 @@ module.exports = function ({ content, attrib = {}, option = {} }) {
   }
   if (!l) l = defWidth[0]
   if (!r) r = defWidth[1]
-  l = bs5.normalizeWidth(l)
-  r = bs5.normalizeWidth(r)
+  l = bs5.normalizeColWidth(l)
+  r = bs5.normalizeColWidth(r)
   bs5.attrib.class = bs5.normalizeArray(bs5.attrib.class, { default: 'mb-3', common: ['row'] })
-  const lblAttrib = bs5.filterAttrib('label', { asValueFor: 'label' })
+  const lblAttrib = bs5.filterAttrib('label', { asValueFor: 'text' })
   lblAttrib.class.unshift(`${l} col-form-label`)
   if (lblAttrib.size) lblAttrib.class.push(`col-form-label-${lblAttrib.size}`)
   const lblEl = label({ attrib: lblAttrib })

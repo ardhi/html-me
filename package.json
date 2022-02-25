@@ -1,6 +1,6 @@
 {
   "name": "html-me",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "HTML maker through sets of functions",
   "main": "index.js",
   "scripts": {
@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/ardhi/html-me#readme",
   "dependencies": {
+    "cheerio": "^1.0.0-rc.10",
     "lodash": "^4.17.21"
   }
 }

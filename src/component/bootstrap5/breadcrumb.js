@@ -12,7 +12,7 @@ module.exports = function ({ content, attrib = {}, option = {} }) {
   _.each(bs5.content, (c, idx) => {
     const isActive = idx === bs5.content.length - 1
     if (_.isPlainObject(c)) {
-      c = isActive ? c.label : misc({ tag: 'a', content: c.label, attrib: { href: c.href || '#' } })
+      c = isActive ? c.text : misc({ tag: 'a', content: c.text, attrib: { href: c.href || '#' } })
     }
     const o = _.merge(_.cloneDeep(itemAttrib), { class: ['breadcrumb-item'] })
     if (isActive) {

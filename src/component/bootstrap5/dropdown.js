@@ -5,7 +5,7 @@ const dropdownMenu = require('./dropdown-menu')
 
 module.exports = function ({ content, attrib = {}, option = {} }) {
   const bs5 = new Bs5({ tag: 'div', content, attrib, option })
-  const btnAttrib = bs5.filterAttrib('button', { asValueFor: 'label' })
+  const btnAttrib = bs5.filterAttrib('button', { asValueFor: 'text' })
   const splitAttrib = bs5.filterAttrib('split')
   let splitEl
   if (splitAttrib.matched) {

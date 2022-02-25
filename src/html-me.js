@@ -1,5 +1,7 @@
 const _ = require('lodash')
 const nl = '\r\n'
+const voidTags = ['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input',
+  'keygen', 'link', 'meta', 'param', 'source', 'track', 'wbr'] // https://html.spec.whatwg.org/multipage/syntax.html#void-elements
 
 class HtmlMe {
   constructor ({ tag, content = [], attrib = {}, option = {} }) {
@@ -12,10 +14,12 @@ class HtmlMe {
     if (_.isString(this.option.omitted)) this.option.omitted = [this.option.omitted]
     this.tag = tag
     this.content = content
-    if (_.isEmpty(this.content) && attrib.label) this.content = attrib.label
-    if (_.isString(this.content)) this.content = [this.content]
+    if (_.isEmpty(this.content) && attrib.text) {
+      this.content = attrib.text
+      this.option.omitted.push('content')
+    }
+    if (!_.isArray(this.content)) this.content = [this.content]
     this.attrib = _.cloneDeep(attrib)
-    if (this.attrib.label) this.option.omitted.push('label')
     this.attrib.class = this.normalizeArray(this.attrib.class, {
       common: this.option.commonClass,
       default: this.option.defaultClass
@@ -25,7 +29,7 @@ class HtmlMe {
       default: this.option.defaultStyle
     })
     this.newLine = option.newLine || false
-    this.enum = {
+    this.attribValues = {
       noValue: ['readonly', 'multiple', 'disabled', 'selected', 'checked']
     }
     this.nl = nl
@@ -41,7 +45,7 @@ class HtmlMe {
       if (_.isArray(v)) v = _.uniq(v).join(' ')
       if (_.isObject(v)) v = this.stringifyObject(v)
       k = _.kebabCase(_.trim(k))
-      if (this.enum.noValue.includes(k)) attrs.push(k)
+      if (this.attribValues.noValue.includes(k)) attrs.push(k)
       else {
         if (!this.isSet(v)) return
         v = v + ''
@@ -128,6 +132,12 @@ class HtmlMe {
     return item
   }
 
+  normalizeUnit (value) {
+    value = value + ''
+    const rx = new RegExp('([a-zA-Z]+)|([0-9]+)','g')
+    return value.match(rx)
+  }
+
   filterAttrib (key, filteredOpts = {}) {
     const filtered = {}
     const rest = []
@@ -155,25 +165,31 @@ class HtmlMe {
     const hasAny = !_.isEmpty(_.keys(_.omit(filtered, ['class', 'style'])))
     const hasKey = _.has(this.attrib, key)
     if (hasClass || hasStyle || hasKey || hasAny) filtered.matched = true // internal use, will be trashed before written
+    if (hasKey && this.attrib[key] === true) delete this.attrib[key]
     return filtered
   }
 
   check (key, strict) {
     const has = _.has(this.attrib, key)
-    return strict ? (has && (this.enum[key] || []).includes(this.attrib[key])) : has
+    return strict ? (has && (this.attribValues[key] || []).includes(this.attrib[key])) : has
   }
 
   addToClass (key, prefix, strict) {
     if (!this.isSet(strict)) strict = true
     if (!this.check(key, strict)) return
     let item = prefix || ''
-    if (this.attrib[key] !== true) item += (prefix ? '-' : '') + this.attrib[key]
+    if (this.attrib[key] === true) {
+      // if (this.attribValues[key].length === 1 && this.attribValues[key][0] === true) item += (prefix ? '-' : '') + key
+      if (this.attribValues[key][0] === true) item += (prefix ? '-' : '') + key
+    } else item += (prefix ? '-' : '') + this.attrib[key]
     this.attrib.class.push(item)
     delete this.attrib[key]
   }
 
   setAttrib (key, value) {
-    this.attrib = _.set(this.attrib, key, value)
+    if (_.isPlainObject(key)) {
+      this.attrib = _.merge(this.attrib, key)
+    } else this.attrib = _.set(this.attrib, key, value)
   }
 
   setAttribClass (value, first) {

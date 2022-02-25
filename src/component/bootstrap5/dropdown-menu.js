@@ -13,7 +13,7 @@ module.exports = function ({ content, attrib = {}, option = {} }) {
   else if (bs5.getAttrib('rightAlignResponsive')) bs5.setAttribClass(`dropdown-menu-${bs5.getAttrib('rightAlignResponsive')}-end`)
   else if (bs5.getAttrib('leftAlignResponsive')) bs5.setAttribClass('dropdown-menu-end', `dropdown-menu-${bs5.getAttrib('leftAlignResponsive')}-start`)
   _.each(bs5.content, (c, idx) => {
-    if (_.isPlainObject(c)) bs5.content[idx] = dropdownItem({ content: c.content, attrib: _.omit(c, ['content']) })
+    if (_.isPlainObject(c)) bs5.content[idx] = dropdownItem({ content: c.text, attrib: _.omit(c, ['content']) })
     else if (c === '-') bs5.content[idx] = dropdownItem({ content: c })
   })
   bs5.option.omitted.push('dark', 'rightAlign', 'rightAlignResponsive', 'leftAlignResponsive')

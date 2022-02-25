@@ -4,7 +4,7 @@ const HtmlMe = require('../../html-me')
 class Bootstrap5 extends HtmlMe {
   constructor (params) {
     super(params)
-    this.enum = _.merge(this.enum, {
+    this.attribValues = _.merge(this.attribValues, {
       rounded: [true, 'pill', 'circle'],
       nowrap: [true],
       flush: [true],
@@ -13,7 +13,7 @@ class Bootstrap5 extends HtmlMe {
       color: ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark', 'body', 'white', 'transparent'],
       breakpoint: ['sm', 'md', 'lg', 'xl', 'xxl'],
       position: ['absolute', 'relative', 'static', 'fixed', 'sticky'],
-      align: ['top', 'bottom', 'left', 'right'],
+      align: ['top', 'bottom', 'start', 'end', 'center'],
       overflow: ['auto', 'hidden', 'visible', 'scroll'],
       float: ['start', 'end', 'none'],
       border: [true, 'top', 'end', 'bottom', 'start'],
@@ -21,17 +21,31 @@ class Bootstrap5 extends HtmlMe {
       border: ['light'],
       translate: ['middle'],
       collapse: ['horizontal'],
-      dropDir: [true, 'dropup', 'dropend', 'dropstart']
+      dropDir: [true, 'dropup', 'dropend', 'dropstart'],
+      responsive: ['fluid'],
+      thumbnail: [true],
+      fade: [true],
+      dark: [true],
+      light: [true],
+      disabled: [true],
+      active: [true],
+      striped: [true],
+      animated: [true],
+      fill: [true, 'justified'],
+      kind: ['tabs', 'pills'],
+      fixed: ['top', 'bottom'],
+      sticky: ['top', 'bottom']
     })
+    this.attribValues.expand = _.concat([true, 'fluid', ], this.attribValues.breakpoint)
   }
 
   sanitize () {
     super.sanitize()
-    const items = _.without(_.keys(this.enum), 'noValue')
+    const items = _.without(_.keys(this.attribValues), 'noValue')
     _.each(items, item => delete this.attrib[item])
   }
 
-  normalizeWidth (w) {
+  normalizeColWidth (w) {
     w = w + ''
     if (w.startsWith('col')) return w
     if (w.includes('-')) return `col-${w}`

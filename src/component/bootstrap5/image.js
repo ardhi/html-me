@@ -1,12 +1,17 @@
 const Bs5 = require('./_class')
+const _ = require('lodash')
 
 module.exports = function ({ attrib = {}, option = {} }) {
-  attrib.class = attrib.class || []
-  if (attrib.responsive) attrib.class.push('img-fluid')
-  if (attrib.thumbnail) attrib.class.push('img-thumbnail')
-  if (attrib.holder) attrib.dataSrc = `holder.js/${attrib.holder}`
   const bs5 = new Bs5({ tag: 'img', content: [], attrib, option })
+  bs5.addToClass('responsive', 'img')
+  bs5.addToClass('thumbnail', 'img')
   bs5.addToClass('rounded', 'rounded')
-  bs5.option.omitted.push('responsive', 'thumbnail', 'holder')
+  const holderAttr = bs5.filterAttrib('holder', { asValueFor: 'src' })
+  if (holderAttr.src) {
+    bs5.setAttrib('dataSrc', 'holder.js/' + holderAttr.src)
+    _.each(['theme', 'random', 'bg', 'fg', 'text', 'size', 'font', 'align', 'outline', 'lineWrap'], (v, idx) => {
+      if (holderAttr[v]) bs5.attrib.dataSrc += `${idx === 0 ? '?' : '&'}${v}=${holderAttr.theme}`
+    })
+  }
   return bs5.write()
 }
