@@ -19,6 +19,7 @@ class HtmlMe {
       this.option.omitted.push('content')
     }
     if (!_.isArray(this.content)) this.content = [this.content]
+    this.content = _.without(this.content, null, undefined)
     this.attrib = _.cloneDeep(attrib)
     this.attrib.class = this.normalizeArray(this.attrib.class, {
       common: this.option.commonClass,
@@ -53,7 +54,7 @@ class HtmlMe {
         attrs.push(_.trim(`${k}="${_.trim(v)}"`))
       }
     })
-    return `<${this.tag}${attrs.length > 0 ? ' ' : ''}${attrs.join(' ')}${this.content.length === 0 ? '/>' : '>'}${this.newLine ? nl : ''}`
+    return `<${this.tag}${attrs.length > 0 ? ' ' : ''}${attrs.join(' ')}${this.content.length === 0 && voidTags.includes(this.tag) ? '/>' : '>'}${this.newLine ? nl : ''}`
   }
 
   close () {
@@ -66,7 +67,7 @@ class HtmlMe {
     if (_.isFunction(this.option.onWrite)) this.option.onWrite.call(this)
     const result = []
     result.push(this.open())
-    if (this.content.length > 0) {
+    if (this.content.length > 0 || !voidTags.includes(this.tag)) {
       result.push(this.content.join(nl))
       result.push(this.close())
     }
